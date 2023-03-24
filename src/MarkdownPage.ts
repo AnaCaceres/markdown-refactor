@@ -1,9 +1,10 @@
 import { Anchor } from "./Anchor";
+import { MarkdownText } from "./types";
 
 export class MarkdownPage {
-  constructor(private readonly content: string) {}
+  constructor(private readonly content: MarkdownText) {}
 
-  moveLinksToFootNotesWithAnchors(): string {
+  moveLinksToFootNotesWithAnchors(): MarkdownText {
     const anchors = this.findAnchorsAtPage(this.content);
     const anchorsFootnotesRelations = this.getAnchorsFootnotesRelations(anchors);
     const replacedText = this.replaceAnchors(this.content, anchorsFootnotesRelations);
@@ -24,7 +25,7 @@ export class MarkdownPage {
     return anchorsFootnotesRelations;
   }
 
-  findAnchorsAtPage(text: string): Array<Anchor> {
+  findAnchorsAtPage(text: MarkdownText): Array<Anchor> {
     const anchors: Array<Anchor> = new Array<Anchor>();
 
     if (this.containsAnchor(text)) {
@@ -33,12 +34,12 @@ export class MarkdownPage {
       const closingTagPosition = text.indexOf(closingTag);
       const openingTagPosition = text.indexOf(openingTag);
 
-      const anchoreExpression = text.substring(
+      const anchorExpression = text.substring(
         openingTagPosition,
         closingTagPosition + closingTag.length
       );
       const rest = text.substring(closingTagPosition + closingTag.length);
-      const anchor = Anchor.fromMarkdownExpression(anchoreExpression);
+      const anchor = Anchor.fromMarkdownExpression(anchorExpression);
       anchors.push(anchor);
 
       const results = this.findAnchorsAtPage(rest);
@@ -52,33 +53,27 @@ export class MarkdownPage {
     return anchors;
   }
 
-  private replaceAnchors(
-    inputContent: string,
-    anchorsDictionary: Record<string, Anchor>
-  ): string {
-    let outputContent = inputContent;
-    Object.keys(anchorsDictionary).forEach((key) => {
+  private replaceAnchors(content: MarkdownText, anchorsFootnotesRelations: Record<string, Anchor>): MarkdownText {
+    let outputContent = content;
+    Object.keys(anchorsFootnotesRelations).forEach((footnoteKey) => {
       outputContent = outputContent.replaceAll(
-        `[${anchorsDictionary[key].text}](${anchorsDictionary[key].url})`,
-        `${anchorsDictionary[key].text} ${key}`
+        `[${anchorsFootnotesRelations[footnoteKey].text}](${anchorsFootnotesRelations[footnoteKey].url})`,
+        `${anchorsFootnotesRelations[footnoteKey].text} ${footnoteKey}`
       );
     });
 
     return outputContent;
   }
 
-  addFootNotes(
-    text: string,
-    anchorsDictionary: Record<string, Anchor>
-  ): string {
+  addFootNotes(text: MarkdownText, anchorsFootnotesRelations: Record<string, Anchor>): MarkdownText {
     const anchorToFootnote = (footnoteKey: string) =>
-      `${footnoteKey}: ${anchorsDictionary[footnoteKey].url}`;
-    return [text, ...Object.keys(anchorsDictionary).map(anchorToFootnote)].join(
+      `${footnoteKey}: ${anchorsFootnotesRelations[footnoteKey].url}`;
+    return [text, ...Object.keys(anchorsFootnotesRelations).map(anchorToFootnote)].join(
       "\n\n"
-    );
+    ) as MarkdownText;
   }
 
-  private containsAnchor(text: string) {
+  private containsAnchor(text: MarkdownText) {
     return text.match(/.*\[.*?\]\(.*?\).*/);
   }
 }
