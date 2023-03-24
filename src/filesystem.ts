@@ -7,7 +7,7 @@ export class FileSystem {
   }
 
   readContent(file: FilePath): MarkdownText {
-    return fs.readFileSync(file).toString();
+    return fs.readFileSync(file).toString() as MarkdownText;
   }
 
   writeContent(file: FilePath, transformedMarkDown: MarkdownText): void {
