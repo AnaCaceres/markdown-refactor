@@ -1,10 +1,17 @@
 import { Anchor } from "./Anchor";
 
 export class MarkdownPage {
-  constructor(private readonly inputContent: string) {}
+  constructor(private readonly content: string) {}
 
   moveLinksToFootNotesWithAnchors(): string {
-    const anchors = this.findAnchorsAtPage(this.inputContent);
+    const anchors = this.findAnchorsAtPage(this.content);
+    const anchorsFootnotesRelations = this.getAnchorsFootnotesRelations(anchors);
+    const replacedText = this.replaceAnchors(this.content, anchorsFootnotesRelations);
+
+    return this.addFootNotes(replacedText, anchorsFootnotesRelations);
+  }
+
+  private getAnchorsFootnotesRelations(anchors: Anchor[]) {
     const createDictionaryFromAnchors = (
       total: Record<string, Anchor>,
       current: Anchor,
@@ -12,13 +19,9 @@ export class MarkdownPage {
     ) => {
       return { ...total, [`[^anchor${index + 1}]`]: current };
     };
-    const anchorsDictionary = anchors.reduce(createDictionaryFromAnchors, {});
+    const anchorsFootnotesRelations = anchors.reduce(createDictionaryFromAnchors, {});
 
-    const replacedText = this.replaceAnchors(
-      this.inputContent,
-      anchorsDictionary
-    );
-    return this.addFootNotes(replacedText, anchorsDictionary);
+    return anchorsFootnotesRelations;
   }
 
   findAnchorsAtPage(text: string): Array<Anchor> {
