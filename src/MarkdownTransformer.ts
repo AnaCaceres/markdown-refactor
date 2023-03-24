@@ -13,7 +13,7 @@ export class MarkDownTransformer {
         }
         const inputContent = this.fileSystem.readContent(inputFile)
         const transformedMarkDown = this.turnLinksIntoFooter(inputContent)
-        this.fileSystem.write(outputFile, transformedMarkDown)
+        this.fileSystem.writeContent(outputFile, transformedMarkDown)
 
     }
 

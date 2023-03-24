@@ -1,15 +1,16 @@
 import * as fs from "fs";
+import { FilePath, MarkdownText } from "./types";
 
 export class FileSystem {
-    exists(inputFile: string) {
-        return fs.existsSync(inputFile)
-    }
+  exists(file: FilePath) {
+    return fs.existsSync(file);
+  }
 
-    readContent(inputFile: string): string {
-        return fs.readFileSync(inputFile).toString()
-    }
+  readContent(file: FilePath): MarkdownText {
+    return fs.readFileSync(file).toString();
+  }
 
-    write(outputFile: string, transformedMarkDown: string): void {
-        fs.writeFileSync(outputFile, transformedMarkDown)
-    }
+  writeContent(file: FilePath, transformedMarkDown: MarkdownText): void {
+    fs.writeFileSync(file, transformedMarkDown);
+  }
 }

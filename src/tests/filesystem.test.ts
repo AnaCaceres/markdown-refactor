@@ -1,16 +1,16 @@
 import {FileSystem} from "../fileSystem";
+import { FilePath, MarkdownText } from "../types";
 import * as fs from "fs";
 
 describe('FileSystem', () => {
     const fileSystem = new FileSystem()
-    const inputFile = 'irrelevant.txt';
+    const inputFile: FilePath = 'irrelevant.txt';
 
     beforeEach(() => {
         if (fs.existsSync(inputFile)) {
             fs.unlinkSync(inputFile)
         }
     })
-
 
     afterEach(() => {
         if (fs.existsSync(inputFile)) {
@@ -35,7 +35,7 @@ describe('FileSystem', () => {
 
     it('write content into a file', () => {
         const contentToBeWritten = 'irrelevant content to be writed';
-        fileSystem.write(inputFile, contentToBeWritten)
+        fileSystem.writeContent(inputFile, contentToBeWritten)
 
         const fileContent = fs.readFileSync(inputFile).toString();
         expect(fileContent).toBe(contentToBeWritten)
