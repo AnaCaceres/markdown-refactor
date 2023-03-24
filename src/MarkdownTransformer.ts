@@ -1,23 +1,24 @@
 import {FileSystem} from "./filesystem";
 import {MarkdownPage} from "./MarkdownPage";
+import { FilePath, MarkdownText } from "./types";
 
 export class MarkDownTransformer {
     constructor(private fileSystem: FileSystem = new FileSystem()) {}
 
-    transform(inputFile: string, outputFile: string) {
+    transform(inputFile: FilePath, outputFile: FilePath) {
         if(!this.fileSystem.exists(inputFile)) {
             throw new Error("Input file does not exists")
         }
         if(this.fileSystem.exists(outputFile)) {
             throw new Error("Output file already exists")
         }
-        const inputContent = this.fileSystem.readContent(inputFile)
-        const transformedMarkDown = this.turnLinksIntoFooter(inputContent)
+        const content = this.fileSystem.readContent(inputFile)
+        const transformedMarkDown = this.turnLinksIntoFooter(content)
         this.fileSystem.writeContent(outputFile, transformedMarkDown)
 
     }
 
-    private turnLinksIntoFooter(inputContent: string): string {
-        return new MarkdownPage(inputContent).moveLinksToFootNotesWithAnchors()
+    private turnLinksIntoFooter(content: MarkdownText): MarkdownText {
+        return new MarkdownPage(content).moveLinksToFootNotesWithAnchors()
     }
 }
